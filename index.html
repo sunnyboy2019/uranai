@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>トランプカード占い</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b 55%, #312e81);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #f8fafc;
+    }
+
+    .app {
+      width: 92%;
+      max-width: 960px;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 28px;
+      padding: 28px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      backdrop-filter: blur(8px);
+    }
+
+    .title {
+      text-align: center;
+      margin-bottom: 8px;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .subtitle {
+      text-align: center;
+      margin: 0 0 24px;
+      color: #dbeafe;
+      font-size: 16px;
+      line-height: 1.8;
+    }
+
+    .main {
+      display: grid;
+      grid-template-columns: 340px 1fr;
+      gap: 28px;
+      align-items: center;
+    }
+
+    .card-area {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 460px;
+    }
+
+    .card {
+      width: 250px;
+      height: 360px;
+      border-radius: 20px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.8s ease;
+      cursor: pointer;
+    }
+
+    .card.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      backface-visibility: hidden;
+      overflow: hidden;
+      box-shadow: 0 18px 36px rgba(0,0,0,0.35);
+    }
+
+    .card-back {
+      background:
+        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), transparent 30%),
+        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.10), transparent 25%),
+        linear-gradient(135deg, #7c3aed, #4338ca);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 8px solid #f8fafc;
+    }
+
+    .back-inner {
+      width: 82%;
+      height: 82%;
+      border: 3px solid rgba(255,255,255,0.75);
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 28px;
+      font-weight: bold;
+      letter-spacing: 0.15em;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
+    }
+
+    .card-front {
+      background: #fff;
+      color: #111827;
+      transform: rotateY(180deg);
+      border: 8px solid #f8fafc;
+      box-sizing: border-box;
+      padding: 18px 20px;
+    }
+
+    .corner {
+      position: absolute;
+      font-size: 28px;
+      line-height: 1.1;
+      font-weight: bold;
+      text-align: center;
+    }
+
+    .corner.top-left {
+      top: 14px;
+      left: 14px;
+    }
+
+    .corner.bottom-right {
+      right: 14px;
+      bottom: 14px;
+      transform: rotate(180deg);
+    }
+
+    .red {
+      color: #dc2626;
+    }
+
+    .black {
+      color: #111827;
+    }
+
+    .center-symbol {
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .symbol-large {
+      font-size: 92px;
+      line-height: 1;
+    }
+
+    .fortune-name {
+      font-size: 22px;
+      font-weight: bold;
+      margin-top: 6px;
+      text-align: center;
+    }
+
+    .info {
+      background: rgba(255,255,255,0.08);
+      border-radius: 22px;
+      padding: 24px;
+      min-height: 420px;
+      box-sizing: border-box;
+    }
+
+    .label {
+      display: inline-block;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.14);
+      color: #e0f2fe;
+      font-size: 13px;
+      margin-bottom: 14px;
+    }
+
+    .result-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 14px;
+      color: #ffffff;
+    }
+
+    .result-text {
+      font-size: 17px;
+      line-height: 1.9;
+      color: #e5e7eb;
+      min-height: 180px;
+      white-space: pre-line;
+    }
+
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .mini-box {
+      background: rgba(255,255,255,0.08);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    .mini-box h3 {
+      margin: 0 0 8px;
+      font-size: 14px;
+      color: #bfdbfe;
+    }
+
+    .mini-box p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.7;
+      color: #f8fafc;
+    }
+
+    .buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      border-radius: 14px;
+      padding: 14px 22px;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+      opacity: 0.92;
+    }
+
+    .draw-btn {
+      background: linear-gradient(135deg, #f59e0b, #ef4444);
+      color: white;
+    }
+
+    .reset-btn {
+      background: rgba(255,255,255,0.14);
+      color: white;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+
+    .guide {
+      margin-top: 14px;
+      font-size: 13px;
+      color: #cbd5e1;
+      line-height: 1.7;
+    }
+
+    @media (max-width: 820px) {
+      .main {
+        grid-template-columns: 1fr;
+      }
+
+      .card-area {
+        min-height: auto;
+      }
+
+      .info {
+        min-height: auto;
+      }
+
+      .mini-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="title">トランプカード占い</div>
+    <p class="subtitle">
+      山札から1枚のカードを引いて、今日の運勢を占います。<br>
+      下のボタンを押すとカードがめくれます。
+    </p>
+
+    <div class="main">
+      <div class="card-area">
+        <div class="card" id="card">
+          <div class="card-face card-back">
+            <div class="back-inner">FORTUNE</div>
+          </div>
+
+          <div class="card-face card-front" id="cardFront">
+            <div class="corner top-left red" id="cornerTop">A<br>♥</div>
+            <div class="corner bottom-right red" id="cornerBottom">A<br>♥</div>
+
+            <div class="center-symbol">
+              <div class="symbol-large red" id="centerSuit">♥</div>
+              <div class="fortune-name" id="cardName">ハートのA</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="info">
+        <div class="label">今日のメッセージ</div>
+        <div class="result-title" id="resultTitle">カードを引いてください</div>
+        <div class="result-text" id="resultText">まだ占い結果は出ていません。</div>
+
+        <div class="mini-grid">
+          <div class="mini-box">
+            <h3>恋愛運</h3>
+            <p id="loveText">---</p>
+          </div>
+          <div class="mini-box">
+            <h3>仕事運</h3>
+            <p id="workText">---</p>
+          </div>
+          <div class="mini-box">
+            <h3>健康運</h3>
+            <p id="healthText">---</p>
+          </div>
+        </div>
+
+        <div class="buttons">
+          <button class="draw-btn" id="drawBtn">カードを引く</button>
+          <button class="reset-btn" id="resetBtn">もとに戻す</button>
+        </div>
+
+        <div class="guide">
+          カードは毎回ランダムで1枚表示されます。<br>
+          まずはこの1枚版で試し、あとから3枚引きや恋愛専用版にも広げられます。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const cards = [
+      {
+        name: "ハートのA",
+        rank: "A",
+        suit: "♥",
+        color: "red",
+        title: "大吉のはじまり",
+        text: "今日は新しい流れが入りやすい日です。\n迷っていたことに、小さくても一歩を出すと良い方向へ進みやすくなります。",
+        love: "素直な気持ちが伝わりやすい日です。",
+        work: "新しい提案が評価されやすい流れです。",
+        health: "気分が軽くなりやすい日です。"
+      },
+      {
+        name: "ハートの7",
+        rank: "7",
+        suit: "♥",
+        color: "red",
+        title: "心が通いやすい日",
+        text: "人との会話が運を開きます。\n急いで結論を出すより、相手の話をよく聞くことで思わぬ幸運が近づきます。",
+        love: "やさしい言葉が良い結果につながります。",
+        work: "協力関係がうまく回りやすいです。",
+        health: "気持ちを落ち着ける時間が大切です。"
+      },
+      {
+        name: "ダイヤのK",
+        rank: "K",
+        suit: "♦",
+        color: "red",
+        title: "仕事運が強い日",
+        text: "現実的な判断が成功を引き寄せます。\n今日は華やかさよりも、確実さを選ぶほど結果が安定します。",
+        love: "落ち着いた対応が信頼を深めます。",
+        work: "責任ある役割で力を発揮しやすいです。",
+        health: "疲れをためない配分が大切です。"
+      },
+      {
+        name: "ダイヤの3",
+        rank: "3",
+        suit: "♦",
+        color: "red",
+        title: "小さな幸運の兆し",
+        text: "大きな変化ではなく、小さな良い出来事が重なる日です。\n身近なことを丁寧にすると、思った以上の満足感があります。",
+        love: "自然体でいるほど魅力が伝わります。",
+        work: "細かな確認が成果につながります。",
+        health: "軽い散歩や体ほぐしが吉です。"
+      },
+      {
+        name: "スペードのA",
+        rank: "A",
+        suit: "♠",
+        color: "black",
+        title: "集中力が高まる日",
+        text: "今日は頭が冴えやすく、考えを整理するのに向いています。\n後回しにしていたことを片づけると、心もすっきりします。",
+        love: "考えすぎず自然な距離感を大切に。",
+        work: "判断力が高まり、重要な整理に向きます。",
+        health: "目や肩を休めるとさらに良いです。"
+      },
+      {
+        name: "スペードの9",
+        rank: "9",
+        suit: "♠",
+        color: "black",
+        title: "慎重さが味方する日",
+        text: "今日は勢いよりも確認が大切です。\n急がず一つずつ進めることで、あとで安心できる流れになります。",
+        love: "早い答えを求めすぎないほうが良いです。",
+        work: "見直し作業で大きな失敗を防げます。",
+        health: "無理をせず休息を優先すると安定します。"
+      },
+      {
+        name: "クラブのJ",
+        rank: "J",
+        suit: "♣",
+        color: "black",
+        title: "挑戦に向く日",
+        text: "新しいことに触れると運気が動きます。\n小さな挑戦でも、今日の経験はあとで自信につながります。",
+        love: "軽やかな会話が距離を縮めます。",
+        work: "試してみる姿勢が良い評価につながります。",
+        health: "体を少し動かすと気分転換になります。"
+      },
+      {
+        name: "クラブの5",
+        rank: "5",
+        suit: "♣",
+        color: "black",
+        title: "発想が広がる日",
+        text: "柔らかい考え方が運を呼びます。\nいつもと少し違う選び方をすると、新鮮な発見がありそうです。",
+        love: "楽しい話題が良い空気を作ります。",
+        work: "アイデアを出す場面で力を発揮します。",
+        health: "気分転換を上手に入れると良いです。"
+      },
+      {
+        name: "ハートのQ",
+        rank: "Q",
+        suit: "♥",
+        color: "red",
+        title: "やさしさが運になる日",
+        text: "今日は自分にも人にもやさしくするほど流れが整います。\n余裕を持った行動が、思った以上に良い印象を生みます。",
+        love: "思いやりがそのまま魅力になります。",
+        work: "周囲への配慮が高く評価されます。",
+        health: "温かい飲み物や休憩が吉です。"
+      },
+      {
+        name: "ダイヤの10",
+        rank: "10",
+        suit: "♦",
+        color: "red",
+        title: "実りを受け取りやすい日",
+        text: "これまで積み重ねたことが形になりやすい日です。\n結果を急がず、今ある成果をきちんと受け取ることが大切です。",
+        love: "安定感のある関係が深まりやすいです。",
+        work: "継続してきた努力が評価されやすいです。",
+        health: "生活のリズムを整えると好調です。"
+      },
+      {
+        name: "スペードの4",
+        rank: "4",
+        suit: "♠",
+        color: "black",
+        title: "休息が鍵になる日",
+        text: "今日は進み続けるより、整えることに意味があります。\n少し立ち止まることで、次の一歩がむしろ確かになります。",
+        love: "無理に動かず自然な流れを大切に。",
+        work: "準備や整理に時間を使うと良いです。",
+        health: "睡眠と休養を意識すると安定します。"
+      },
+      {
+        name: "クラブのA",
+        rank: "A",
+        suit: "♣",
+        color: "black",
+        title: "始動のチャンス",
+        text: "元気よく始めるほど流れが生まれます。\n今日は迷うよりも、まず手をつけることが幸運の入口になります。",
+        love: "明るい態度が良い印象を与えます。",
+        work: "スタートダッシュが成功につながります。",
+        health: "朝の行動を整えると調子が上がります。"
+      }
+    ];
+
+    const card = document.getElementById("card");
+    const drawBtn = document.getElementById("drawBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    const cornerTop = document.getElementById("cornerTop");
+    const cornerBottom = document.getElementById("cornerBottom");
+    const centerSuit = document.getElementById("centerSuit");
+    const cardName = document.getElementById("cardName");
+
+    const resultTitle = document.getElementById("resultTitle");
+    const resultText = document.getElementById("resultText");
+    const loveText = document.getElementById("loveText");
+    const workText = document.getElementById("workText");
+    const healthText = document.getElementById("healthText");
+
+    function setCardColor(color) {
+      const colorClass = color === "red" ? "red" : "black";
+      cornerTop.className = "corner top-left " + colorClass;
+      cornerBottom.className = "corner bottom-right " + colorClass;
+      centerSuit.className = "symbol-large " + colorClass;
+    }
+
+    function drawCard() {
+      const randomIndex = Math.floor(Math.random() * cards.length);
+      const c = cards[randomIndex];
+
+      cornerTop.innerHTML = c.rank + "<br>" + c.suit;
+      cornerBottom.innerHTML = c.rank + "<br>" + c.suit;
+      centerSuit.textContent = c.suit;
+      cardName.textContent = c.name;
+
+      setCardColor(c.color);
+
+      resultTitle.textContent = c.title;
+      resultText.textContent = c.text;
+      loveText.textContent = c.love;
+      workText.textContent = c.work;
+      healthText.textContent = c.health;
+
+      card.classList.remove("flipped");
+      setTimeout(function () {
+        card.classList.add("flipped");
+      }, 60);
+    }
+
+    function resetCard() {
+      card.classList.remove("flipped");
+      resultTitle.textContent = "カードを引いてください";
+      resultText.textContent = "まだ占い結果は出ていません。";
+      loveText.textContent = "---";
+      workText.textContent = "---";
+      healthText.textContent = "---";
+    }
+
+    drawBtn.addEventListener("click", drawCard);
+    resetBtn.addEventListener("click", resetCard);
+  </script>
+</body>
+</html>
