@@ -83,28 +83,11 @@
     }
 
     .card-base {
-      background:
-        radial-gradient(circle at 30% 30%, rgba(255,255,255,0.18), transparent 30%),
-        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.10), transparent 25%),
-        linear-gradient(135deg, #7c3aed, #4338ca);
+      background-image: url("card-back.png");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
       border: 8px solid #f8fafc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-
-    .back-inner {
-      width: 82%;
-      height: 82%;
-      border: 3px solid rgba(255,255,255,0.75);
-      border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 28px;
-      font-weight: bold;
-      letter-spacing: 0.12em;
-      text-shadow: 0 2px 6px rgba(0,0,0,0.25);
     }
 
     .card-reveal {
@@ -350,9 +333,7 @@
       <div class="main">
         <div class="left-panel">
           <div class="card-shell">
-            <div class="card-base">
-              <div class="back-inner">FORTUNE</div>
-            </div>
+            <div class="card-base"></div>
 
             <div class="card-reveal" id="cardReveal">
               <div class="corner top-left red" id="cornerTop">A<br>♥</div>
@@ -392,8 +373,8 @@
           </div>
 
           <div class="guide">
-            スマホでも動きやすいように、カードは反転ではなく安定した表示切り替え方式にしています。<br>
-            うまく動いたら、このあと3枚引き版にも広げられます。
+            カード裏面は `card-back.png` を表示しています。<br>
+            画像を差し替えたいときは、同じ名前で上書きすると見た目を更新できます。
           </div>
         </div>
       </div>
